@@ -20,7 +20,12 @@ function Repository({ repo, canDelete }) {
     <div className="py-2 font-semibold flex justify-between items-center">
       <span>
         <span className="text-gray-500">{repo.organization.name} /</span>{" "}
-        {repo.name}
+        {repo.name}{" "}
+        {repo.isPublic && (
+          <span className="text-xs font-normal text-gray-600 border border-gray-300 rounded ml-1 px-1 py-0.5">
+            Public
+          </span>
+        )}
       </span>
       {canDelete ? (
         <button
@@ -71,9 +76,10 @@ const classes = {
   },
   Repository: class {
     static name = "Repository";
-    constructor(organization, name) {
+    constructor(organization, name, isPublic = false) {
       this.name = name;
       this.organization = organization;
+      this.isPublic = isPublic;
     }
   },
   Organization: class {
@@ -94,6 +100,7 @@ const repos = {
   search: new classes.Repository(orgs.google, "search"),
   messenger: new classes.Repository(orgs.facebook, "messenger"),
   instagram: new classes.Repository(orgs.facebook, "instagram"),
+  react: new classes.Repository(orgs.facebook, "react", true),
 };
 
 const users = {
@@ -108,9 +115,11 @@ const users = {
 };
 
 const nonePolicy = {
+  name: "Allow anything",
   polar: `
-# Allow any user to perform any action on any
-# resource
+# The '_' signs are wildcards, allowing
+# any actor to perform any action on any
+# resource. Not very useful...
 allow(_, _, _);
 `.trim(),
   users: {
@@ -119,9 +128,11 @@ allow(_, _, _);
 };
 
 const emptyPolicy = {
+  name: "Empty",
   polar: `
 # Oso is deny-by-default, so an empty policy
-# means nobody can do anything.
+# means nobody can do anything. This system is
+# locked down.
 `.trim(),
   users: {
     "-": new classes.User(),
@@ -129,11 +140,14 @@ const emptyPolicy = {
 };
 
 const readOnlyPolicy = {
+  name: "Only public repos",
   polar: `
 # Allow any user to perform the "read" action
-# on any resource. Note that deleting
-# repositories is no longer allowed.
-allow(_, "read", _);
+# on a repository if it is public. Note that
+# the delete button is disabled, because no
+# one has permission to delete it.
+allow(_, "read", repository: Repository) if
+  repository.isPublic;
 `.trim(),
   users: {
     "-": new classes.User(),
@@ -141,7 +155,10 @@ allow(_, "read", _);
 };
 
 const rbacPolicy = {
+  name: "Basic RBAC",
   polar: `
+# Now roles are involved -- users have roles
+# on organizations.
 resource Organization {
   roles = ["member", "owner"];
 
@@ -149,24 +166,38 @@ resource Organization {
   "member" if "owner";
 }
 
+resource Repository {
+  permissions = ["read", "delete"];
+  relations = {parent: Organization};
+
+  "read" if "member" on "parent";
+  "delete" if "owner" on "parent";
+}
+
 has_role(actor, role_name, resource) if
   role in actor.roles and
   role matches { name: role_name, resource: resource };
 
-allow(actor, "read", repository) if
-  has_role(actor, "member", repository.organization);
+has_relation(organization, "parent", repository) if
+  repository.organization = organization;
 
-allow(actor, "delete", repository) if
-  has_role(actor, "owner", repository.organization);
+allow(_, "read", repository: Repository) if
+  repository.isPublic;
+
+allow(actor, action, resource) if
+  has_permission(actor, action, resource);
 `.trim(),
   users: {
-    "Member of google": new classes.User([["member", orgs.google]]),
-    "Owner of facebook": new classes.User([["owner", orgs.facebook]]),
+    "Owner of google": new classes.User([["owner", orgs.google]]),
+    "Member of facebook": new classes.User([["member", orgs.facebook]]),
   },
 };
 
 const advancedPolicy = {
+  name: "Advanced RBAC",
   polar: `
+# Now roles are involved -- users have roles
+# on organizations.
 resource Repository {
   permissions = ["read", "delete"];
   roles = ["contributor", "admin"];
@@ -191,6 +222,9 @@ has_relation(organization, "parent", repository) if
 has_role(actor, role_name, resource) if
   role in actor.roles and
   role matches { name: role_name, resource: resource };
+
+allow(_, "read", repository: Repository) if
+  repository.isPublic;
 
 allow(actor, action, resource) if
   has_permission(actor, action, resource);
@@ -279,11 +313,11 @@ export default function WhatIsOso() {
               value={selectedPolicyName}
               onChange={(e) => setSelectedPolicyName(e.target.value)}
             >
-              <option value="none">None</option>
-              <option value="empty">Empty</option>
-              <option value="read">Read-only</option>
-              <option value="rbac">Basic RBAC</option>
-              <option value="advanced">Advanced RBAC</option>
+              {Object.entries(policies).map(([name, repo]) => (
+                <option value={name} key={name}>
+                  {repo.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
