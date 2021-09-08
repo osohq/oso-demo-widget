@@ -198,6 +198,8 @@ allow(actor, action, resource) if
   users: {
     "Member of google": new classes.User([["member", orgs.google]]),
     "Owner of facebook": new classes.User([["owner", orgs.facebook]]),
+    "Contributor to search": new classes.User([["contributor", repos.search]]),
+    "Admin of messenger": new classes.User([["admin", repos.messenger]]),
   },
 };
 
@@ -206,7 +208,7 @@ const policies = {
   empty: emptyPolicy,
   read: readOnlyPolicy,
   rbac: rbacPolicy,
-  // advanced: advancedPolicy,
+  advanced: advancedPolicy,
 };
 
 export default function WhatIsOso() {
@@ -281,6 +283,7 @@ export default function WhatIsOso() {
               <option value="empty">Empty</option>
               <option value="read">Read-only</option>
               <option value="rbac">Basic RBAC</option>
+              <option value="advanced">Advanced RBAC</option>
             </select>
           </div>
         </div>
