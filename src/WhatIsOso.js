@@ -132,10 +132,10 @@ const users = {
 const nonePolicy = {
   name: "Allow anything",
   polar: `
-# The '_' signs are wildcards, allowing
+# This rule matches all inputs, allowing
 # any actor to perform any action on any
 # resource. Not very useful...
-allow(_, _, _);
+allow(_actor, _action, _resource);
 `.trim(),
   users: {
     "-": new classes.User(),
@@ -326,7 +326,7 @@ export default function WhatIsOso() {
     .map(([action, repo]) => repo);
 
   return (
-    <div className="grid grid-cols-3 max-w-6xl" style={{ minHeight: 400 }}>
+    <div className="grid grid-cols-3" style={{ minHeight: 400 }}>
       <div
         className="text-gray-200 rounded-lg p-4 pr-20 col-span-2"
         style={{ background: "rgb(43, 43, 43)" }}
