@@ -15,12 +15,25 @@ import { Oso } from "oso";
 
 const Heading = (props) => <h1 className="text-xl font-bold" {...props}></h1>;
 
+function OrganizationName({ organization }) {
+  return <span className="text-blue-600 font-normal">{organization.name}</span>;
+}
+
+function RepoName({ repo }) {
+  return (
+    <span>
+      <OrganizationName organization={repo.organization} />{" "}
+      <span className="text-gray-400">/</span>{" "}
+      <span className="text-blue-600 font-semibold">{repo.name}</span>
+    </span>
+  );
+}
+
 function Repository({ repo, canDelete }) {
   return (
-    <div className="py-2 font-semibold flex justify-between items-center">
+    <div className="py-2 flex justify-between items-center">
       <span>
-        <span className="text-gray-500">{repo.organization.name} /</span>{" "}
-        {repo.name}{" "}
+        <RepoName repo={repo} />
         {repo.isPublic && (
           <span className="text-xs font-normal text-gray-600 border border-gray-300 rounded ml-1 px-1 py-0.5">
             Public
@@ -168,6 +181,8 @@ resource Organization {
 
 resource Repository {
   permissions = ["read", "delete"];
+  # "Relations" let us derive permissions
+  # from related objects
   relations = {parent: Organization};
 
   "read" if "member" on "parent";
@@ -178,7 +193,8 @@ has_role(actor, role_name, resource) if
   role in actor.roles and
   role matches { name: role_name, resource: resource };
 
-has_relation(organization, "parent", repository) if
+has_relation(organization: Organization,
+             "parent", repository: Repository) if
   repository.organization = organization;
 
 allow(_, "read", repository: Repository) if
@@ -216,12 +232,13 @@ resource Organization {
   "member" if "owner";
 }
 
-has_relation(organization, "parent", repository) if
-  repository.organization = organization;
-
 has_role(actor, role_name, resource) if
   role in actor.roles and
   role matches { name: role_name, resource: resource };
+
+has_relation(organization: Organization,
+  "parent", repository: Repository) if
+repository.organization = organization;
 
 allow(_, "read", repository: Repository) if
   repository.isPublic;
@@ -233,7 +250,10 @@ allow(actor, action, resource) if
     "Member of google": new classes.User([["member", orgs.google]]),
     "Owner of facebook": new classes.User([["owner", orgs.facebook]]),
     "Contributor to search": new classes.User([["contributor", repos.search]]),
-    "Admin of messenger": new classes.User([["admin", repos.messenger]]),
+    "Admin of messenger": new classes.User([
+      ["admin", repos.messenger],
+      ["contributor", repos.gmail],
+    ]),
   },
 };
 
@@ -359,6 +379,26 @@ export default function WhatIsOso() {
             <div className="rounded-full bg-white p-1 px-4">gitclub.com</div>
           </div>
           <div className="p-4">
+            {user.roles.length > 0 && (
+              <div>
+                <Heading>Roles</Heading>
+                <div className="mb-2" />
+                <div className="">
+                  {user.roles.map(({ name, resource }) => (
+                    <div>
+                      <span className="font-semibold">{name}</span>{" "}
+                      <span className="text-sm">on</span>{" "}
+                      {resource instanceof classes.Organization ? (
+                        <OrganizationName organization={resource} />
+                      ) : (
+                        <RepoName repo={resource} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mb-4" />
+              </div>
+            )}
             <Heading>Repos</Heading>
             <div className="mb-2" />
             <div className="divide-y divide-light-gray-400">
