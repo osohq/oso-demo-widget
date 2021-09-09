@@ -3,6 +3,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark as dark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { Oso } from "oso";
 
+const LEARN_MORE_URL = "https://docs.osohq.com";
+
 // let Oso;
 // import("oso")
 //   .catch((e) => console.error("Error importing `oso`:", e))
@@ -269,6 +271,10 @@ export default function WhatIsOso() {
   const [selectedPolicyName, setSelectedPolicyName] = useState("none");
   const policy = policies[selectedPolicyName];
 
+  const policyNames = Object.keys(policies);
+  const nextPolicyName =
+    policyNames[policyNames.indexOf(selectedPolicyName) + 1];
+
   const [selectedUser, setSelectedUser] = useState(
     Object.keys(policy.users)[0]
   );
@@ -325,7 +331,7 @@ export default function WhatIsOso() {
         className="text-gray-200 rounded-lg p-4 pr-20 col-span-2"
         style={{ background: "rgb(43, 43, 43)" }}
       >
-        <div className="flex mb-5">
+        <div className="flex mb-5 items-center">
           <Heading>Policy:</Heading>
           <div className="ml-3">
             <select
@@ -339,6 +345,22 @@ export default function WhatIsOso() {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="ml-3">
+            {nextPolicyName ? (
+              <button
+                className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded"
+                onClick={() => setSelectedPolicyName(nextPolicyName)}
+              >
+                Next
+              </button>
+            ) : (
+              <a href={LEARN_MORE_URL}>
+                <button className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded">
+                  Learn more &rarr;
+                </button>
+              </a>
+            )}
           </div>
         </div>
         <SyntaxHighlighter
