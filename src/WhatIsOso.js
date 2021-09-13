@@ -5,17 +5,9 @@ import { Oso } from "oso";
 
 const LEARN_MORE_URL = "https://docs.osohq.com";
 
-// let Oso;
-// import("oso")
-//   .catch((e) => console.error("Error importing `oso`:", e))
-//   // .then((m) => m())
-//   .then((m) => {
-//     console.log(m);
-//     Oso = m.Oso;
-//     console.log(Oso);
-//   });
-
-const Heading = (props) => <h1 className="text-xl font-bold" {...props}></h1>;
+const Heading = (props) => (
+  <h1 className="sm:text-xl font-bold" {...props}></h1>
+);
 
 function OrganizationName({ organization }) {
   return <span className="text-blue-600 font-normal">{organization.name}</span>;
@@ -54,27 +46,6 @@ function Repository({ repo, canDelete }) {
           Delete
         </button>
       )}
-    </div>
-  );
-}
-
-function Issue({ repo, title }) {
-  return (
-    <div className="py-2 flex justify-between items-center">
-      <div>
-        {title}
-        <div className="text-xs mt-1">
-          on{" "}
-          <span className="font-semibold">
-            <span className="text-gray-500">{repo.org} /</span> {repo.name}
-          </span>
-        </div>
-      </div>
-      <div>
-        <button className="bg-green-700 py-1 px-2 rounded text-sm text-white pointer-events-none">
-          Close
-        </button>
-      </div>
     </div>
   );
 }
@@ -125,7 +96,7 @@ const users = {
   ]),
   user2: new classes.User([
     ["owner", orgs.facebook],
-    ["contributor", repos.search],
+    ["reader", repos.search],
   ]),
 };
 
@@ -161,7 +132,7 @@ const readOnlyPolicy = {
 # on a repository if it is public. Note that
 # the delete button is disabled, because no
 # one has permission to delete it.
-allow(_, "read", repository: Repository) if
+allow(_actor, "read", repository: Repository) if
   repository.isPublic;
 `.trim(),
   users: {
@@ -173,41 +144,32 @@ const rbacPolicy = {
   name: "Basic RBAC",
   polar: `
 # Now roles are involved -- users have roles
-# on organizations.
-resource Organization {
-  roles = ["member", "owner"];
-
-  # Being an owner implies being a member
-  "member" if "owner";
-}
-
+# on repositories, granting them permissions
+# specific to each repository.
 resource Repository {
   permissions = ["read", "delete"];
-  # "Relations" let us derive permissions
-  # from related objects
-  relations = {parent: Organization};
+  roles = ["reader", "admin"];
 
-  "read" if "member" on "parent";
-  "delete" if "owner" on "parent";
+  "delete" if "admin";
+  "read" if "reader";
+
+  "reader" if "admin";
 }
 
 has_role(actor, role_name, resource) if
   role in actor.roles and
-  role matches { name: role_name, resource: resource };
+  role.name = role_name and
+  role.resource = resource;
 
-has_relation(organization: Organization,
-             "parent", repository: Repository) if
-  repository.organization = organization;
-
-allow(_, "read", repository: Repository) if
+allow(_actor, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
   has_permission(actor, action, resource);
 `.trim(),
   users: {
-    "Owner of google": new classes.User([["owner", orgs.google]]),
-    "Member of facebook": new classes.User([["member", orgs.facebook]]),
+    "Admin of gmail": new classes.User([["admin", repos.gmail]]),
+    "Reader of instagram": new classes.User([["reader", repos.instagram]]),
   },
 };
 
@@ -218,14 +180,14 @@ const advancedPolicy = {
 # on organizations.
 resource Repository {
   permissions = ["read", "delete"];
-  roles = ["contributor", "admin"];
+  roles = ["reader", "admin"];
   relations = {parent: Organization};
 
   "delete" if "admin";
-  "read" if "contributor";
+  "read" if "reader";
 
-  "contributor" if "admin";
-  "contributor" if "member" on "parent";
+  "reader" if "admin";
+  "reader" if "member" on "parent";
   "admin" if "owner" on "parent";
 }
 
@@ -239,10 +201,10 @@ has_role(actor, role_name, resource) if
   role matches { name: role_name, resource: resource };
 
 has_relation(organization: Organization,
-  "parent", repository: Repository) if
-repository.organization = organization;
+             "parent", repository: Repository) if
+  repository.organization = organization;
 
-allow(_, "read", repository: Repository) if
+allow(_actor, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
@@ -251,10 +213,10 @@ allow(actor, action, resource) if
   users: {
     "Member of google": new classes.User([["member", orgs.google]]),
     "Owner of facebook": new classes.User([["owner", orgs.facebook]]),
-    "Contributor to search": new classes.User([["contributor", repos.search]]),
-    "Admin of messenger": new classes.User([
+    "Reader of search": new classes.User([["reader", repos.search]]),
+    "Multiple roles": new classes.User([
       ["admin", repos.messenger],
-      ["contributor", repos.gmail],
+      ["reader", repos.gmail],
     ]),
   },
 };
@@ -326,16 +288,22 @@ export default function WhatIsOso() {
     .map(([action, repo]) => repo);
 
   return (
-    <div className="grid grid-cols-3" style={{ minHeight: 400 }}>
+    <div
+      className="flex items-stretch"
+      style={{
+        minHeight: 500,
+        maxHeight: 500,
+      }}
+    >
       <div
-        className="text-gray-200 rounded-lg p-4 pr-20 col-span-2"
+        className="text-gray-200 rounded-lg p-4 sm:pr-20 col-span-2 w-full sm:w-2/3 flex flex-col"
         style={{ background: "rgb(43, 43, 43)" }}
       >
         <div className="flex mb-5 items-center">
           <Heading>Policy:</Heading>
           <div className="ml-3">
             <select
-              className="text-black border-solid border-1 p-1 rounded"
+              className="text-black border-solid border-1 p-1 rounded bg-white"
               value={selectedPolicyName}
               onChange={(e) => setSelectedPolicyName(e.target.value)}
             >
@@ -363,19 +331,31 @@ export default function WhatIsOso() {
             )}
           </div>
         </div>
-        <SyntaxHighlighter
-          customStyle={{
-            padding: 0,
-            margin: 0,
-          }}
-          language="ruby"
-          wrapLongLines={true}
-          style={dark}
-        >
-          {policy.polar}
-        </SyntaxHighlighter>
+        <div className="relative overflow-hidden">
+          <SyntaxHighlighter
+            customStyle={{
+              padding: "0 0 60px",
+              margin: 0,
+              overflow: "auto",
+            }}
+            className="overflow-auto text-xs sm:text-base h-full"
+            language="ruby"
+            wrapLongLines={true}
+            style={dark}
+          >
+            {policy.polar}
+          </SyntaxHighlighter>
+          <div
+            className="absolute inset-x-0 bottom-0"
+            style={{
+              height: 60,
+              background:
+                "linear-gradient(rgba(43, 43, 43, 0), rgb(43, 43, 43))",
+            }}
+          ></div>
+        </div>
       </div>
-      <div className="p-4 flex flex-col rounded-r">
+      <div className="p-4 flex-col rounded-r flex-grow hidden sm:flex">
         <div
           className="flex mb-4 justify-end"
           style={{
@@ -386,7 +366,7 @@ export default function WhatIsOso() {
           <Heading>View app as:</Heading>
           <div className="ml-3">
             <select
-              className="text-black border border-gray-400 py-1 rounded"
+              className="text-black border border-gray-400 p-1 rounded bg-white"
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
             >
@@ -396,11 +376,16 @@ export default function WhatIsOso() {
             </select>
           </div>
         </div>
-        <div className="bg-white flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg">
+        <div className="bg-white flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg pointer-events-none">
           <div className="border-b bg-gray-100 border-gray-200 p-2 rounded-t-md">
             <div className="rounded-full bg-white p-1 px-4">gitclub.com</div>
           </div>
-          <div className="p-4">
+          <div className="p-4 relative">
+            <div className="absolute top-0 right-0 m-4">
+              <div className="border border-gray-200 text-gray-500 px-2 p-1 text-xs rounded">
+                Sample app
+              </div>
+            </div>
             {user.roles.length > 0 && (
               <div>
                 <Heading>Roles</Heading>
@@ -437,28 +422,7 @@ export default function WhatIsOso() {
                 No repos :(
               </div>
             )}
-            <div className="mb-4" />
-
-            {/* <Heading>Issues</Heading>
             <div className="mb-2" />
-            <div className="divide-y divide-light-gray-400">
-              <Issue
-                title="Something is broken :("
-                repo={{ org: "google", name: "gmail" }}
-              />
-              <Issue
-                title="Something is broken :("
-                repo={{ org: "google", name: "search" }}
-              />
-              <Issue
-                title="Something is broken :("
-                repo={{ org: "facebook", name: "messenger" }}
-              />
-              <Issue
-                title="Something is broken :("
-                repo={{ org: "facebook", name: "news-feed" }}
-              />
-            </div> */}
           </div>
         </div>
       </div>
