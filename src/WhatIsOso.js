@@ -1,7 +1,35 @@
+import React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { a11yDark as dark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { Oso } from "oso";
+import SyntaxHighlighter from "react-syntax-highlighter/dist/cjs/prism-light";
+import ruby from "react-syntax-highlighter/dist/esm/languages/prism/ruby";
+import rawTheme from "react-syntax-highlighter/dist/cjs/styles/hljs/shades-of-purple";
+import rawTheme2 from "react-syntax-highlighter/dist/cjs/styles/prism/shades-of-purple";
+
+const dark = { ...rawTheme2 };
+console.log(rawTheme2);
+console.log(dark);
+
+const goodPurples = {
+  background: "rgb(45, 43, 85)",
+  text: "rgb(255, 255, 255)",
+  variable: "rgb(158, 255, 255)",
+  attribute: "rgb(158, 255, 255)",
+  definition: "rgb(158, 255, 255)",
+  keyword: "rgb(255, 157, 0)",
+  operator: "rgb(255, 157, 0)",
+  property: "rgb(250, 208, 0)",
+  number: "rgb(255, 98, 140)",
+  string: "rgb(165, 255, 144)",
+  comment: "rgb(179, 98, 255)",
+  meta: "rgb(255, 157, 0)",
+};
+
+Object.entries(dark).forEach(([key, value]) => {
+  // if (value.color === "#4cd213") dark[key].color = goodPurples.string;
+  // if (value.color === "#ac65ff") dark[key].color = goodPurples.comment;
+});
+
+SyntaxHighlighter.registerLanguage("ruby", ruby);
 
 const LEARN_MORE_URL = "https://docs.osohq.com";
 
@@ -227,6 +255,15 @@ const policies = {
   advanced: advancedPolicy,
 };
 
+const allPermissions = Object.values(repos)
+  .map((repo) => {
+    return [
+      ["read", repo],
+      ["delete", repo],
+    ];
+  })
+  .flat(1);
+
 export default function WhatIsOso() {
   const [selectedPolicyName, setSelectedPolicyName] = useState("none");
   const policy = policies[selectedPolicyName];
@@ -239,18 +276,28 @@ export default function WhatIsOso() {
     Object.keys(policy.users)[0]
   );
 
+  const [Oso, setOso] = useState(null);
+
+  useEffect(async () => {
+    import("oso").then((m) => {
+      setOso(() => m.Oso);
+    });
+  });
+
   const user =
     policy.users[selectedUser] || policy.users[Object.keys(policy.users)[0]];
 
   const oso = useMemo(() => {
+    if (!Oso) return null;
     const oso = new Oso();
     oso.registerClass(classes.User);
     oso.registerClass(classes.Repository);
     oso.registerClass(classes.Organization);
     return oso;
-  }, []);
+  }, [Oso]);
 
   useEffect(() => {
+    if (!oso) return;
     oso.clearRules();
     oso.loadStr(policy.polar);
     window.oso = oso;
@@ -259,12 +306,12 @@ export default function WhatIsOso() {
     // window.users = users;
   }, [oso, policy]);
 
-  const [repoPermissions, setRepoPermissions] = useState([]);
+  const [repoPermissions, setRepoPermissions] = useState(allPermissions);
   useEffect(async () => {
+    if (!oso) return;
     let repoPermissions = await Promise.all(
       Object.values(repos).map(async (repo) => {
         const canRead = await oso.isAllowed(user, "read", repo);
-        console.log(canRead);
         const canDelete = await oso.isAllowed(user, "delete", repo);
         const permissions = [];
         if (canRead) permissions.push(["read", repo]);
@@ -276,7 +323,6 @@ export default function WhatIsOso() {
     setRepoPermissions(repoPermissions);
   }, [oso, policy, setRepoPermissions, user]);
 
-  console.log(repoPermissions);
   const readableRepos = repoPermissions
     .filter(([action, repo]) => action == "read")
     .map(([action, repo]) => repo);
@@ -295,7 +341,7 @@ export default function WhatIsOso() {
     >
       <div
         className="text-gray-200 rounded-lg p-4 sm:pr-20 col-span-2 w-full sm:w-2/3 flex flex-col"
-        style={{ background: "rgb(43, 43, 43)" }}
+        style={{ background: goodPurples.background }}
       >
         <div className="flex mb-5 items-center">
           <Heading>Policy:</Heading>
@@ -335,6 +381,7 @@ export default function WhatIsOso() {
               padding: "0 0 60px",
               margin: 0,
               overflow: "auto",
+              backgroundColor: goodPurples.background,
             }}
             className="overflow-auto text-xs sm:text-base h-full"
             language="ruby"
@@ -347,8 +394,7 @@ export default function WhatIsOso() {
             className="absolute inset-x-0 bottom-0"
             style={{
               height: 60,
-              background:
-                "linear-gradient(rgba(43, 43, 43, 0), rgb(43, 43, 43))",
+              background: "linear-gradient(#2D2B5500, #2D2B55)",
             }}
           ></div>
         </div>
@@ -374,7 +420,7 @@ export default function WhatIsOso() {
             </select>
           </div>
         </div>
-        <div className="bg-white flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg pointer-events-none">
+        <div className="bg-white text-gray-900 flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg pointer-events-none">
           <div className="border-b bg-gray-100 border-gray-200 p-2 rounded-t-md">
             <div className="rounded-full bg-white p-1 px-4">gitclub.com</div>
           </div>
@@ -390,7 +436,7 @@ export default function WhatIsOso() {
                 <div className="mb-2" />
                 <div className="">
                   {user.roles.map(({ name, resource }) => (
-                    <div>
+                    <div key={`${name}${JSON.stringify(resource)}`}>
                       <span className="font-semibold">{name}</span>{" "}
                       <span className="text-sm">on</span>{" "}
                       {resource instanceof classes.Organization ? (

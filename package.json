@@ -1,20 +1,32 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "webpack-dev-server",
+    "build": "NODE_ENV=production webpack",
+    "upload": "aws s3 sync dist s3://oso-web-demo"
   },
   "dependencies": {
-    "next": "latest",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.3.2",
     "oso": "^0.20.0-beta",
+    "postcss-loader": "^6.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-syntax-highlighter": "^15.4.4"
+    "react-syntax-highlighter": "^15.4.4",
+    "style-loader": "^3.2.1",
+    "util": "^0.12.4",
+    "webpack": "^5.52.1",
+    "webpack-dev-server": "^4.2.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.6",
-    "postcss": "^8.3.5",
-    "tailwindcss": "^2.2.4"
+    "postcss": "^8.3.6",
+    "tailwindcss": "^2.2.4",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cli": "^4.8.0"
   }
 }
