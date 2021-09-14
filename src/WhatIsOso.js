@@ -2,36 +2,18 @@ import React from "react";
 import { useEffect, useMemo, useState } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter/dist/cjs/prism-light";
 import ruby from "react-syntax-highlighter/dist/esm/languages/prism/ruby";
-import rawTheme from "react-syntax-highlighter/dist/cjs/styles/hljs/shades-of-purple";
-import rawTheme2 from "react-syntax-highlighter/dist/cjs/styles/prism/shades-of-purple";
-
-const dark = { ...rawTheme2 };
-console.log(rawTheme2);
-console.log(dark);
+import dark from "react-syntax-highlighter/dist/cjs/styles/prism/shades-of-purple";
+import { repos, policies, classes } from "./policies";
 
 const goodPurples = {
   background: "rgb(45, 43, 85)",
-  text: "rgb(255, 255, 255)",
-  variable: "rgb(158, 255, 255)",
-  attribute: "rgb(158, 255, 255)",
-  definition: "rgb(158, 255, 255)",
-  keyword: "rgb(255, 157, 0)",
-  operator: "rgb(255, 157, 0)",
-  property: "rgb(250, 208, 0)",
-  number: "rgb(255, 98, 140)",
-  string: "rgb(165, 255, 144)",
-  comment: "rgb(179, 98, 255)",
-  meta: "rgb(255, 157, 0)",
 };
-
-Object.entries(dark).forEach(([key, value]) => {
-  // if (value.color === "#4cd213") dark[key].color = goodPurples.string;
-  // if (value.color === "#ac65ff") dark[key].color = goodPurples.comment;
-});
 
 SyntaxHighlighter.registerLanguage("ruby", ruby);
 
-const LEARN_MORE_URL = "https://docs.osohq.com";
+const LEARN_MORE_URL =
+  window.LEARN_MORE_URL ||
+  "https://docs.osohq.com/getting-started/quickstart.html";
 
 const Heading = (props) => (
   <h1 className="sm:text-xl font-bold" {...props}></h1>
@@ -63,197 +45,56 @@ function Repository({ repo, canDelete }) {
         )}
       </span>
       {canDelete ? (
-        <button
+        <Button
+          small
           className="bg-pink-700 py-1 px-2 rounded text-sm text-white pointer-events-none"
           disabled={!canDelete}
         >
           Delete
-        </button>
+        </Button>
       ) : (
-        <button className="bg-gray-300 py-1 px-2 rounded text-sm text-white pointer-events-none">
+        <Button
+          small
+          className="bg-gray-300 py-1 px-2 rounded text-sm text-white pointer-events-none"
+        >
           Delete
-        </button>
+        </Button>
       )}
     </div>
   );
 }
 
-const classes = {
-  User: class {
-    static name = "User";
-    constructor(roles = []) {
-      this.roles = roles.map(([name, resource]) => ({
-        name,
-        resource,
-      }));
-    }
-  },
-  Repository: class {
-    static name = "Repository";
-    constructor(organization, name, isPublic = false) {
-      this.name = name;
-      this.organization = organization;
-      this.isPublic = isPublic;
-    }
-  },
-  Organization: class {
-    static name = "Organization";
-    constructor(name) {
-      this.name = name;
-    }
-  },
-};
-
-const orgs = {
-  google: new classes.Organization("google"),
-  facebook: new classes.Organization("facebook"),
-};
-
-const repos = {
-  gmail: new classes.Repository(orgs.google, "gmail"),
-  search: new classes.Repository(orgs.google, "search"),
-  messenger: new classes.Repository(orgs.facebook, "messenger"),
-  instagram: new classes.Repository(orgs.facebook, "instagram"),
-  react: new classes.Repository(orgs.facebook, "react", true),
-};
-
-const users = {
-  user1: new classes.User([
-    ["member", orgs.google],
-    ["admin", repos.search],
-  ]),
-  user2: new classes.User([
-    ["owner", orgs.facebook],
-    ["reader", repos.search],
-  ]),
-};
-
-const nonePolicy = {
-  name: "Allow anything",
-  polar: `
-# This rule matches all inputs, allowing
-# any actor to perform any action on any
-# resource. Not very useful...
-allow(_actor, _action, _resource);
-`.trim(),
-  users: {
-    "-": new classes.User(),
-  },
-};
-
-const emptyPolicy = {
-  name: "Empty",
-  polar: `
-# Oso is deny-by-default, so an empty policy
-# means nobody can do anything. This system is
-# locked down.
-`.trim(),
-  users: {
-    "-": new classes.User(),
-  },
-};
-
-const readOnlyPolicy = {
-  name: "Only public repos",
-  polar: `
-# Allow any user to perform the "read" action
-# on a repository if it is public. Note that
-# the delete button is disabled, because no
-# one has permission to delete it.
-allow(_actor, "read", repository: Repository) if
-  repository.isPublic;
-`.trim(),
-  users: {
-    "-": new classes.User(),
-  },
-};
-
-const rbacPolicy = {
-  name: "Basic RBAC",
-  polar: `
-# Now roles are involved -- users have roles
-# on repositories, granting them permissions
-# specific to each repository.
-resource Repository {
-  permissions = ["read", "delete"];
-  roles = ["reader", "admin"];
-
-  "delete" if "admin";
-  "read" if "reader";
-
-  "reader" if "admin";
+function Select(props) {
+  return (
+    <select
+      style={{
+        color: "black",
+        border: "1px solid",
+        borderColor: goodPurples.background,
+        padding: 2,
+        borderRadius: "4px",
+        background: "white",
+      }}
+      {...props}
+    />
+  );
 }
 
-has_role(actor, role_name, resource) if
-  role in actor.roles and
-  role.name = role_name and
-  role.resource = resource;
-
-allow(_actor, "read", repository: Repository) if
-  repository.isPublic;
-
-allow(actor, action, resource) if
-  has_permission(actor, action, resource);
-`.trim(),
-  users: {
-    "Admin of gmail": new classes.User([["admin", repos.gmail]]),
-    "Reader of instagram": new classes.User([["reader", repos.instagram]]),
-  },
-};
-
-const advancedPolicy = {
-  name: "Advanced RBAC",
-  polar: `
-resource Repository {
-  permissions = ["read", "delete"];
-  roles = ["reader", "admin"];
-  relations = {parent: Organization};
-
-  "delete" if "admin";
-  "read" if "reader";
-
-  "reader" if "admin";
-  "reader" if "member" on "parent";
-  "admin" if "owner" on "parent";
+function Button({ small, ...props }) {
+  return (
+    <button
+      style={{
+        padding: small ? "0.2rem 0.6rem" : "0.25rem 0.75rem",
+        borderRadius: 4,
+        border: "0 none",
+        fontSize: small ? "14px" : "16px",
+        cursor: "pointer",
+        lineHeight: small ? "1.35" : "1.15",
+      }}
+      {...props}
+    />
+  );
 }
-
-resource Organization {
-  roles = ["member", "owner"];
-  "member" if "owner";
-}
-
-has_role(actor, role_name, resource) if
-  role in actor.roles and
-  role matches { name: role_name, resource: resource };
-
-has_relation(organization: Organization,
-             "parent", repository: Repository) if
-  repository.organization = organization;
-
-allow(_actor, "read", repository: Repository) if
-  repository.isPublic;
-
-allow(actor, action, resource) if
-  has_permission(actor, action, resource);
-`.trim(),
-  users: {
-    "Member of google": new classes.User([["member", orgs.google]]),
-    "Owner of facebook": new classes.User([["owner", orgs.facebook]]),
-    "Reader of search": new classes.User([["reader", repos.search]]),
-    "Multiple roles": new classes.User([
-      ["admin", repos.messenger],
-      ["reader", repos.gmail],
-    ]),
-  },
-};
-
-const policies = {
-  none: nonePolicy,
-  empty: emptyPolicy,
-  read: readOnlyPolicy,
-  rbac: rbacPolicy,
-  advanced: advancedPolicy,
-};
 
 const allPermissions = Object.values(repos)
   .map((repo) => {
@@ -301,7 +142,6 @@ export default function WhatIsOso() {
     oso.clearRules();
     oso.loadStr(policy.polar);
     window.oso = oso;
-    window.users = users;
     window.repos = repos;
     // window.users = users;
   }, [oso, policy]);
@@ -333,21 +173,20 @@ export default function WhatIsOso() {
 
   return (
     <div
-      className="flex items-stretch"
+      className="oso-web-demo flex items-stretch antialiased"
       style={{
         minHeight: 500,
         maxHeight: 500,
       }}
     >
       <div
-        className="text-gray-200 rounded-lg p-4 sm:pr-20 col-span-2 w-full sm:w-2/3 flex flex-col"
+        className="text-gray-200 rounded-lg p-6 sm:pr-20 col-span-2 w-full sm:w-2/3 flex flex-col"
         style={{ background: goodPurples.background }}
       >
         <div className="flex mb-5 items-center">
           <Heading>Policy:</Heading>
           <div className="ml-3">
-            <select
-              className="text-black border-solid border-1 p-1 rounded bg-white"
+            <Select
               value={selectedPolicyName}
               onChange={(e) => setSelectedPolicyName(e.target.value)}
             >
@@ -356,21 +195,21 @@ export default function WhatIsOso() {
                   {repo.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="ml-3">
             {nextPolicyName ? (
-              <button
+              <Button
                 className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded"
                 onClick={() => setSelectedPolicyName(nextPolicyName)}
               >
                 Next
-              </button>
+              </Button>
             ) : (
               <a href={LEARN_MORE_URL}>
-                <button className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded">
-                  Learn more &rarr;
-                </button>
+                <Button className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded">
+                  Try it &rarr;
+                </Button>
               </a>
             )}
           </div>
@@ -383,7 +222,7 @@ export default function WhatIsOso() {
               overflow: "auto",
               backgroundColor: goodPurples.background,
             }}
-            className="overflow-auto text-xs sm:text-base h-full"
+            className="overflow-auto text-xs sm:text-base h-full font-mono"
             language="ruby"
             wrapLongLines={true}
             style={dark}
@@ -401,7 +240,7 @@ export default function WhatIsOso() {
       </div>
       <div className="p-4 flex-col rounded-r flex-grow hidden sm:flex">
         <div
-          className="flex mb-4 justify-end"
+          className="flex mb-4 justify-end items-center"
           style={{
             visibility:
               Object.keys(policy.users).length > 1 ? "visible" : "hidden",
@@ -409,15 +248,14 @@ export default function WhatIsOso() {
         >
           <Heading>View app as:</Heading>
           <div className="ml-3">
-            <select
-              className="text-black border border-gray-400 p-1 rounded bg-white"
+            <Select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
             >
               {Object.keys(policy.users).map((name) => (
                 <option key={name}>{name}</option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
         <div className="bg-white text-gray-900 flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg pointer-events-none">
@@ -433,7 +271,7 @@ export default function WhatIsOso() {
             {user.roles.length > 0 && (
               <div>
                 <Heading>Roles</Heading>
-                <div className="mb-2" />
+                <div className="mb-4" />
                 <div className="">
                   {user.roles.map(({ name, resource }) => (
                     <div key={`${name}${JSON.stringify(resource)}`}>
@@ -452,7 +290,7 @@ export default function WhatIsOso() {
             )}
             <Heading>Repos</Heading>
             <div className="mb-2" />
-            <div className="divide-y divide-light-gray-400">
+            <div className="with-dividers">
               {readableRepos.map((repo) => (
                 <Repository
                   repo={repo}
