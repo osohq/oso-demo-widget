@@ -176,8 +176,6 @@ allow(actor, action, resource) if
 const advancedPolicy = {
   name: "Advanced RBAC",
   polar: `
-# Now roles are involved -- users have roles
-# on organizations.
 resource Repository {
   permissions = ["read", "delete"];
   roles = ["reader", "admin"];
