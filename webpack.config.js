@@ -23,7 +23,10 @@ module.exports = {
     syncWebAssembly: true,
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: "index.html" }),
+    new HtmlWebpackPlugin({
+      template: "index.html",
+      filename: "../index.html",
+    }),
     new webpack.DefinePlugin({
       "process.env": JSON.stringify({}),
     }),
