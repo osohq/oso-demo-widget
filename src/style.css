@@ -38,7 +38,3 @@
     border-top: 1px solid #eee;
   }
 }
-
-/* @tailwind base; */
-@tailwind components;
-@tailwind utilities;

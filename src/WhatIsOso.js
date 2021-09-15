@@ -16,50 +16,80 @@ const LEARN_MORE_URL =
   "https://docs.osohq.com/getting-started/quickstart.html";
 
 const Heading = (props) => (
-  <h1 className="sm:text-xl font-bold" {...props}></h1>
+  <h1 {...props}>
+    {props.children}
+    <style jsx>{`
+      h1 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        margin: 0;
+        font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+          "Helvetica Neue", sans-serif;
+      }
+    `}</style>
+  </h1>
 );
 
 function OrganizationName({ organization }) {
-  return <span className="text-blue-600 font-normal">{organization.name}</span>;
+  return (
+    <span style={{ color: "rgb(37, 99, 235)", fontWeight: 400 }}>
+      {organization.name}
+    </span>
+  );
 }
 
 function RepoName({ repo }) {
   return (
     <span>
       <OrganizationName organization={repo.organization} />{" "}
-      <span className="text-gray-400">/</span>{" "}
-      <span className="text-blue-600 font-semibold">{repo.name}</span>
+      <span style={{ color: "rgb(156, 163, 175)" }}>/</span>{" "}
+      <span style={{ color: "rgb(37, 99, 235)", fontWeight: 600 }}>
+        {repo.name}
+      </span>
     </span>
   );
 }
 
 function Repository({ repo, canDelete }) {
   return (
-    <div className="py-2 flex justify-between items-center">
+    <div className="repo">
+      <style jsx>{`
+        .repo {
+          padding: 0.5rem 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .public {
+          font-size: 0.75rem;
+          line-height: 1rem;
+          font-weight: 400;
+          color: rgb(75, 85, 99);
+          border: 1px solid rgb(209, 213, 219);
+          border-radius: 0.25rem;
+          padding: 0.125rem 0.25rem;
+          margin-left: 0.25rem;
+        }
+
+        :global(.delete) {
+          color: white;
+          background-color: rgb(190, 24, 93);
+        }
+
+        :global(.delete:disabled) {
+          color: white;
+          background-color: rgb(209, 213, 219);
+        }
+      `}</style>
       <span>
         <RepoName repo={repo} />
-        {repo.isPublic && (
-          <span className="text-xs font-normal text-gray-600 border border-gray-300 rounded ml-1 px-1 py-0.5">
-            Public
-          </span>
-        )}
+        {repo.isPublic && <span className="public">Public</span>}
       </span>
-      {canDelete ? (
-        <Button
-          small
-          className="bg-pink-700 py-1 px-2 rounded text-sm text-white pointer-events-none"
-          disabled={!canDelete}
-        >
-          Delete
-        </Button>
-      ) : (
-        <Button
-          small
-          className="bg-gray-300 py-1 px-2 rounded text-sm text-white pointer-events-none"
-        >
-          Delete
-        </Button>
-      )}
+      <Button small className="delete" disabled={!canDelete}>
+        Delete
+      </Button>
     </div>
   );
 }
@@ -90,6 +120,7 @@ function Button({ small, ...props }) {
         fontSize: small ? "14px" : "16px",
         cursor: "pointer",
         lineHeight: small ? "1.35" : "1.15",
+        color: "white",
       }}
       {...props}
     />
@@ -173,17 +204,162 @@ export default function WhatIsOso() {
 
   return (
     <div
-      className="oso-web-demo flex items-stretch antialiased"
+      className="oso-web-demo"
       style={{
         minHeight: 500,
         maxHeight: 500,
       }}
     >
+      <style jsx>{`
+        .oso-web-demo {
+          display: flex;
+          align-items: stretch;
+          -webkit-font-smoothing: antialiased;
+        }
+
+        .policy-container {
+          color: rgb(229, 231, 235);
+          border-radius: 0.5rem;
+          padding: 1.5rem;
+          padding-right: 5rem;
+          width: 66.66%;
+
+          display: flex;
+          flex-direction: column;
+        }
+
+        .policy-selector {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1.25rem;
+        }
+
+        @media screen and (max-width: 640px) {
+          .policy-container {
+            padding-right: 1.5rem;
+            width: 100%;
+          }
+
+          .code :global(pre) {
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+
+          .demo-app-container {
+            display: none;
+          }
+        }
+
+        :global(.next) {
+          background-color: rgb(59, 130, 246);
+        }
+
+        :global(.next):hover {
+          background-color: rgb(96, 165, 250);
+        }
+
+        .ml-3 {
+          margin-left: 0.75rem;
+        }
+
+        .mb-4 {
+          margin-bottom: 1rem;
+        }
+        .mb-2 {
+          margin-bottom: 0.5rem;
+        }
+
+        .code {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .code :global(pre) {
+          overflow: auto;
+          font-size: 1rem;
+          line-height: 1.5rem;
+          height: 100%;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+            "Liberation Mono", "Courier New", monospace;
+        }
+
+        .shadow {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 60px;
+          background: linear-gradient(#2d2b5500, #2d2b55);
+        }
+
+        .demo-app-container {
+          padding: 1rem;
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          border-radius: 0 0.25rem 0.25rem 0;
+        }
+
+        .role-selector {
+          display: flex;
+          margin-bottom: 1rem;
+          justify-content: end;
+          align-items: center;
+        }
+
+        .demo-app {
+          background: #fff;
+          color: rgb(17, 24, 39);
+          flex: 1;
+          border-radius: 0.5rem;
+          border: 1px solid rgb(209, 213, 219);
+          margin-left: -4rem;
+          box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+            rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+        }
+
+        .demo-app-url-bar {
+          border-bottom: 1px solid rgb(229, 231, 235);
+          border-radius: 0.5rem 0.5rem 0 0;
+          padding: 0.5rem;
+          background-color: rgb(243, 244, 246);
+        }
+
+        .demo-app-url-bar div {
+          border-radius: 2rem;
+          background: white;
+          padding: 0.25rem 1rem;
+        }
+
+        .demo-app-inner {
+          padding: 1rem;
+          position: relative;
+        }
+
+        .sample-app-badge {
+          position: absolute;
+          top: 0;
+          right: 0;
+          margin: 1rem;
+          font-size: 0.75rem;
+          line-height: 1rem;
+          color: rgb(107, 114, 128);
+          padding: 0.25rem 0.5rem;
+          border: 1px solid rgb(229, 231, 235);
+          border-radius: 0.25rem;
+        }
+
+        .no-repos {
+          display: flex;
+          justify-content: center;
+          color: #888;
+        }
+      `}</style>
       <div
-        className="text-gray-200 rounded-lg p-6 sm:pr-20 col-span-2 w-full sm:w-2/3 flex flex-col"
+        className="policy-container"
         style={{ background: goodPurples.background }}
       >
-        <div className="flex mb-5 items-center">
+        <div className="policy-selector">
           <Heading>Policy:</Heading>
           <div className="ml-3">
             <Select
@@ -200,21 +376,19 @@ export default function WhatIsOso() {
           <div className="ml-3">
             {nextPolicyName ? (
               <Button
-                className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded"
+                className="next"
                 onClick={() => setSelectedPolicyName(nextPolicyName)}
               >
                 Next
               </Button>
             ) : (
               <a href={LEARN_MORE_URL}>
-                <Button className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-0.5 rounded">
-                  Try it &rarr;
-                </Button>
+                <Button className="next">Try it &rarr;</Button>
               </a>
             )}
           </div>
         </div>
-        <div className="relative overflow-hidden">
+        <div className="code">
           <SyntaxHighlighter
             customStyle={{
               padding: "0 0 60px",
@@ -222,25 +396,18 @@ export default function WhatIsOso() {
               overflow: "auto",
               backgroundColor: goodPurples.background,
             }}
-            className="overflow-auto text-xs sm:text-base h-full font-mono"
             language="ruby"
             wrapLongLines={true}
             style={dark}
           >
             {policy.polar}
           </SyntaxHighlighter>
-          <div
-            className="absolute inset-x-0 bottom-0"
-            style={{
-              height: 60,
-              background: "linear-gradient(#2D2B5500, #2D2B55)",
-            }}
-          ></div>
+          <div className="shadow" />
         </div>
       </div>
-      <div className="p-4 flex-col rounded-r flex-grow hidden sm:flex">
+      <div className="demo-app-container">
         <div
-          className="flex mb-4 justify-end items-center"
+          className="role-selector"
           style={{
             visibility:
               Object.keys(policy.users).length > 1 ? "visible" : "hidden",
@@ -258,16 +425,12 @@ export default function WhatIsOso() {
             </Select>
           </div>
         </div>
-        <div className="bg-white text-gray-900 flex-1 rounded-md border border-gray-300 -ml-16 shadow-lg pointer-events-none">
-          <div className="border-b bg-gray-100 border-gray-200 p-2 rounded-t-md">
-            <div className="rounded-full bg-white p-1 px-4">gitclub.com</div>
+        <div className="demo-app">
+          <div className="demo-app-url-bar">
+            <div>gitclub.com</div>
           </div>
-          <div className="p-4 relative">
-            <div className="absolute top-0 right-0 m-4">
-              <div className="border border-gray-200 text-gray-500 px-2 p-1 text-xs rounded">
-                Sample app
-              </div>
-            </div>
+          <div className="demo-app-inner">
+            <div className="sample-app-badge">Sample app</div>
             {user.roles.length > 0 && (
               <div>
                 <Heading>Roles</Heading>
@@ -275,8 +438,8 @@ export default function WhatIsOso() {
                 <div className="">
                   {user.roles.map(({ name, resource }) => (
                     <div key={`${name}${JSON.stringify(resource)}`}>
-                      <span className="font-semibold">{name}</span>{" "}
-                      <span className="text-sm">on</span>{" "}
+                      <span style={{ fontWeight: 600 }}>{name}</span>{" "}
+                      <span style={{ fontSize: "0.875rem" }}>on</span>{" "}
                       {resource instanceof classes.Organization ? (
                         <OrganizationName organization={resource} />
                       ) : (
@@ -300,9 +463,7 @@ export default function WhatIsOso() {
               ))}
             </div>
             {!readableRepos.length && (
-              <div className="flex justify-center text-gray-500">
-                No repos :(
-              </div>
+              <div className="no-repos">No repos :(</div>
             )}
             <div className="mb-2" />
           </div>
