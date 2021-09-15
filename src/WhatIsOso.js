@@ -215,6 +215,10 @@ export default function WhatIsOso() {
           display: flex;
           align-items: stretch;
           -webkit-font-smoothing: antialiased;
+          font-family: ui-sans-serif, system-ui, -apple-system,
+            BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+            "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+            "Segoe UI Symbol", "Noto Color Emoji";
         }
 
         .policy-container {
@@ -226,6 +230,10 @@ export default function WhatIsOso() {
 
           display: flex;
           flex-direction: column;
+        }
+
+        .policy-container :global(h1) {
+          color: rgb(229, 231, 235);
         }
 
         .policy-selector {
@@ -262,11 +270,11 @@ export default function WhatIsOso() {
           margin-left: 0.75rem;
         }
 
-        .mb-4 {
-          margin-bottom: 1rem;
+        .pb-4 {
+          padding-bottom: 1rem;
         }
-        .mb-2 {
-          margin-bottom: 0.5rem;
+        .pb-2 {
+          padding-bottom: 0.5rem;
         }
 
         .code {
@@ -279,6 +287,9 @@ export default function WhatIsOso() {
           font-size: 1rem;
           line-height: 1.5rem;
           height: 100%;
+        }
+
+        .code :global(code) {
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
             "Liberation Mono", "Courier New", monospace;
         }
@@ -413,7 +424,7 @@ export default function WhatIsOso() {
               Object.keys(policy.users).length > 1 ? "visible" : "hidden",
           }}
         >
-          <Heading>View app as:</Heading>
+          <Heading>View as:</Heading>
           <div className="ml-3">
             <Select
               value={selectedUser}
@@ -434,7 +445,7 @@ export default function WhatIsOso() {
             {user.roles.length > 0 && (
               <div>
                 <Heading>Roles</Heading>
-                <div className="mb-4" />
+                <div className="pb-4" />
                 <div className="">
                   {user.roles.map(({ name, resource }) => (
                     <div key={`${name}${JSON.stringify(resource)}`}>
@@ -448,11 +459,11 @@ export default function WhatIsOso() {
                     </div>
                   ))}
                 </div>
-                <div className="mb-4" />
+                <div className="pb-4" />
               </div>
             )}
             <Heading>Repos</Heading>
-            <div className="mb-2" />
+            <div className="pb-2" />
             <div className="with-dividers">
               {readableRepos.map((repo) => (
                 <Repository
@@ -465,7 +476,7 @@ export default function WhatIsOso() {
             {!readableRepos.length && (
               <div className="no-repos">No repos :(</div>
             )}
-            <div className="mb-2" />
+            <div className="pb-2" />
           </div>
         </div>
       </div>

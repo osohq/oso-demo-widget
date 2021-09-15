@@ -98,7 +98,7 @@ has_role(actor, role_name, resource) if
   role.name = role_name and
   role.resource = resource;
 
-allow(_actor, "read", repository: Repository) if
+has_permission(_actor, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
@@ -116,7 +116,7 @@ const advancedPolicy = {
 resource Repository {
   permissions = ["read", "delete"];
   roles = ["reader", "admin"];
-  relations = {parent: Organization};
+  relations = { parent: Organization };
 
   "delete" if "admin";
   "read" if "reader";
@@ -133,13 +133,14 @@ resource Organization {
 
 has_role(actor, role_name, resource) if
   role in actor.roles and
-  role matches { name: role_name, resource: resource };
+  role.name = role_name and
+  role.resource = resource;
 
 has_relation(organization: Organization,
              "parent", repository: Repository) if
   repository.organization = organization;
 
-allow(_actor, "read", repository: Repository) if
+has_permission(_actor, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
