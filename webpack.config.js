@@ -3,12 +3,13 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const dist = path.resolve(__dirname, "dist");
+const datetime = new Date().toISOString().replace(/[\-:TZ\.]/g, "");
 
 const isProduction = process.env.NODE_ENV === "production";
 const publicPath = isProduction
-  ? "https://oso-web-demo.s3.us-west-2.amazonaws.com/bundle-[hash]/"
+  ? `https://oso-web-demo.s3.us-west-2.amazonaws.com/bundle-${datetime}/`
   : "/";
-const outputPath = isProduction ? path.join(dist, "bundle-[hash]") : dist;
+const outputPath = isProduction ? path.join(dist, `bundle-${datetime}`) : dist;
 
 module.exports = {
   mode: isProduction ? "production" : "development",
