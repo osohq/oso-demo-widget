@@ -7,7 +7,10 @@ import { repos, policies, classes } from "./policies";
 
 const goodPurples = {
   background: "rgb(45, 43, 85)",
+  comment: "#bc7ff5",
 };
+
+dark.comment.color = goodPurples.comment;
 
 SyntaxHighlighter.registerLanguage("ruby", ruby);
 
@@ -242,22 +245,6 @@ export default function WhatIsOso() {
           margin-bottom: 1.25rem;
         }
 
-        @media screen and (max-width: 640px) {
-          .policy-container {
-            padding-right: 1.5rem;
-            width: 100%;
-          }
-
-          .code :global(pre) {
-            font-size: 0.75rem;
-            line-height: 1rem;
-          }
-
-          .demo-app-container {
-            display: none;
-          }
-        }
-
         :global(.next) {
           background-color: rgb(59, 130, 246);
         }
@@ -364,6 +351,22 @@ export default function WhatIsOso() {
           display: flex;
           justify-content: center;
           color: #888;
+        }
+
+        @media screen and (max-width: 640px) {
+          .policy-container {
+            padding-right: 1.5rem;
+            width: 100%;
+          }
+
+          .code :global(pre) {
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+
+          .demo-app-container {
+            display: none;
+          }
         }
       `}</style>
       <div
