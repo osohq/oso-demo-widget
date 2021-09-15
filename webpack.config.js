@@ -3,30 +3,25 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const dist = path.resolve(__dirname, "dist");
-const datetime = new Date().toISOString().replace(/[\-:TZ\.]/g, "");
-
+const isS3Build = process.env.S3 !== undefined;
 const isProduction = process.env.NODE_ENV === "production";
-const publicPath = isProduction
-  ? `https://oso-web-demo.s3.us-west-2.amazonaws.com/bundle-${datetime}/`
+const publicPath = isS3Build
+  ? `https://oso-web-demo.s3.us-west-2.amazonaws.com/`
   : "/";
-const outputPath = isProduction ? path.join(dist, `bundle-${datetime}`) : dist;
 
 module.exports = {
   mode: isProduction ? "production" : "development",
   entry: "./src/index.js",
   output: {
-    path: outputPath,
+    path: dist,
     publicPath,
-    filename: "bundle.js",
+    filename: "bundle-[chunkhash].js",
   },
   experiments: {
     syncWebAssembly: true,
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: "index.html",
-      filename: "../index.html",
-    }),
+    new HtmlWebpackPlugin({ template: "index.html" }),
     new webpack.DefinePlugin({
       "process.env": JSON.stringify({}),
     }),
