@@ -15,7 +15,7 @@ module.exports = {
   output: {
     path: dist,
     publicPath,
-    filename: "bundle-[chunkhash].js",
+    filename: "[name]-[chunkhash].js",
   },
   experiments: {
     syncWebAssembly: true,
