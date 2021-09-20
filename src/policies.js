@@ -80,6 +80,8 @@ allow(_actor, "read", repository: Repository) if
 const rbacPolicy = {
   name: "Basic RBAC",
   polar: `
+actor User {}
+
 # Now roles are involved -- users have roles
 # on repositories, granting them permissions
 # specific to each repository.
@@ -93,12 +95,12 @@ resource Repository {
   "reader" if "admin";
 }
 
-has_role(actor, role_name, resource) if
+has_role(actor: User, role_name: String, resource: Repository) if
   role in actor.roles and
   role.name = role_name and
   role.resource = resource;
 
-has_permission(_actor, "read", repository: Repository) if
+has_permission(_actor: User, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
@@ -113,6 +115,8 @@ allow(actor, action, resource) if
 const advancedPolicy = {
   name: "Advanced RBAC",
   polar: `
+actor User {}
+
 resource Repository {
   permissions = ["read", "delete"];
   roles = ["reader", "admin"];
@@ -131,7 +135,7 @@ resource Organization {
   "member" if "owner";
 }
 
-has_role(actor, role_name, resource) if
+has_role(actor: User, role_name: String, resource: Repository) if
   role in actor.roles and
   role.name = role_name and
   role.resource = resource;
@@ -140,7 +144,7 @@ has_relation(organization: Organization,
              "parent", repository: Repository) if
   repository.organization = organization;
 
-has_permission(_actor, "read", repository: Repository) if
+has_permission(_actor: User, "read", repository: Repository) if
   repository.isPublic;
 
 allow(actor, action, resource) if
