@@ -5,9 +5,7 @@ const webpack = require("webpack");
 const dist = path.resolve(__dirname, "dist");
 const isS3Build = process.env.S3 !== undefined;
 const isProduction = process.env.NODE_ENV === "production";
-const publicPath = isS3Build
-  ? `https://${process.env.CDN_URL}.s3.us-west-2.amazonaws.com/`
-  : "/";
+const publicPath = isS3Build ? process.env.CDN_URL + "/" : "/";
 
 module.exports = {
   mode: isProduction ? "production" : "development",
