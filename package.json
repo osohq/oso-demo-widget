@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "NODE_ENV=production webpack",
-    "build:s3": "NODE_ENV=production S3=1 webpack"
+    "build:s3": "NODE_ENV=production S3=1 webpack",
+    "build:s3:entrypoint": "cp `ls -t dist/main* | head -1` dist/main.js"
   },
   "dependencies": {
     "@babel/core": "^7.15.5",

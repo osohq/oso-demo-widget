@@ -24,4 +24,5 @@ jobs:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
         run: |
           npm run build:s3
+          npm run build:s3:entrypoint
           aws s3 sync dist s3://$S3_BUCKET_NAME

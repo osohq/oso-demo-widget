@@ -4,7 +4,9 @@ import WhatIsOso from "./WhatIsOso";
 import "./style.css";
 window.process = undefined;
 
-window.addEventListener("load", () => {
-  const target = document.getElementById("oso-web-demo");
-  ReactDOM.render(<WhatIsOso />, target);
-});
+export function run() {
+  window.addEventListener("load", () => {
+    const target = document.getElementById("oso-web-demo");
+    ReactDOM.render(<WhatIsOso />, target);
+  });
+}
