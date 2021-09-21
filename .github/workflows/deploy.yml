@@ -21,7 +21,8 @@ jobs:
         run: npm install
       - name: Build
         env:
-          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_BUCKET_NAME: oso-demo-widget
+          CDN_URL: https://dattiugky046l.cloudfront.net
         run: |
           npm run build:s3
           npm run build:s3:entrypoint
