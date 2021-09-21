@@ -411,7 +411,6 @@ export default function WhatIsOso() {
               backgroundColor: goodPurples.background,
             }}
             language="ruby"
-            wrapLongLines={true}
             style={dark}
           >
             {policy.polar}
