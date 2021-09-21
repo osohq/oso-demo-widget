@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "NODE_ENV=production webpack",
-    "upload": "NODE_ENV=production S3=1 webpack && aws s3 sync dist s3://oso-web-demo"
+    "build:s3": "NODE_ENV=production S3=1 webpack"
   },
   "dependencies": {
     "@babel/core": "^7.15.5",
