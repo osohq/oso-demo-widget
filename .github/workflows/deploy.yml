@@ -19,7 +19,7 @@ jobs:
           aws-region: us-east-1
       - name: Install dependencies
         run: npm install
-      - name: Build
+      - name: Build and upload to S3
         env:
           S3_BUCKET_NAME: oso-demo-widget
           CDN_URL: https://dattiugky046l.cloudfront.net
@@ -27,3 +27,4 @@ jobs:
           npm run build:s3
           npm run build:s3:entrypoint
           aws s3 sync dist s3://$S3_BUCKET_NAME
+          aws s3 cp s3://$S3_BUCKET_NAME/main.js s3://$S3_BUCKET_NAME/main.js --metadata-directive REPLACE --cache-control no-cache
