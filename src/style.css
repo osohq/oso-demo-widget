@@ -1,4 +1,5 @@
-.oso-web-demo {
+.oso-web-demo,
+.oso-widget {
   div,
   pre {
     box-sizing: border-box;
