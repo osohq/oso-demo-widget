@@ -165,19 +165,35 @@ export default function OsoValues() {
           background: linear-gradient(#2d2b5500, #2d2b55);
         }
 
+        .policy-selector-wrapper {
+          display: flex;
+        }
+
+        .select {
+          margin-left: 0.75rem;
+        }
+
         @media screen and (max-width: 640px) {
           .policy-container {
             padding-right: 1.5rem;
             width: 100%;
           }
 
-          .code :global(pre) {
-            font-size: 0.75rem;
-            line-height: 1rem;
+          .policy-selector {
+            align-items: end;
           }
 
           .demo-app-container {
             display: none;
+          }
+
+          .policy-selector-wrapper {
+            flex-direction: column;
+          }
+
+          .select {
+            margin-left: 0;
+            margin-top: 0.5rem;
           }
         }
 
@@ -190,18 +206,20 @@ export default function OsoValues() {
         style={{ background: goodColors.background }}
       >
         <div className="policy-selector">
-          <Heading>Value:</Heading>
-          <div className="ml-3">
-            <Select
-              value={selectedValueName}
-              onChange={(e) => setSelectedValueName(e.target.value)}
-            >
-              {Object.entries(values).map(([name, value]) => (
-                <option value={name} key={name}>
-                  {value.name}
-                </option>
-              ))}
-            </Select>
+          <div className="policy-selector-wrapper">
+            <Heading>Value:</Heading>
+            <div className="select">
+              <Select
+                value={selectedValueName}
+                onChange={(e) => setSelectedValueName(e.target.value)}
+              >
+                {Object.entries(values).map(([name, value]) => (
+                  <option value={name} key={name}>
+                    {value.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
           <div className="ml-3">
             {nextValueName ? (
@@ -213,7 +231,7 @@ export default function OsoValues() {
               </Button>
             ) : (
               <a href={LEARN_MORE_URL}>
-                <Button className="next">Try it &rarr;</Button>
+                <Button className="next">Join us &rarr;</Button>
               </a>
             )}
           </div>
