@@ -54,7 +54,7 @@ succeed too.**
 };
 
 const practiceFeedback = {
-  name: "Practice feedback",
+  name: "Practice feedback daily",
   polar: `
 # Practice giving and taking feedback daily
 
