@@ -135,7 +135,7 @@ resource Organization {
   "member" if "owner";
 }
 
-has_role(actor: User, role_name: String, resource: Repository) if
+has_role(actor: User, role_name: String, resource: Resource) if
   role in actor.roles and
   role.name = role_name and
   role.resource = resource;
