@@ -68,7 +68,7 @@ issues, and hold ourselves to a high bar.**
 - Feedback happens in all directions,
   regardless of your position
 
-[1]: https://kimmalonescott.com/what-is-radical-candor/
+[1]: https://review.firstround.com/radical-candor-the-surprising-secret-to-being-a-good-boss
 `.trim(),
 };
 
