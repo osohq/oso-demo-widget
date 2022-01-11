@@ -3182,6 +3182,11 @@ lodash.debounce@^4.0.8:
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
+
 lodash.memoize@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
@@ -3524,10 +3529,12 @@ opener@^1.5.2:
   resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
-oso@^0.20.0-beta:
-  version "0.20.0-beta"
-  resolved "https://registry.yarnpkg.com/oso/-/oso-0.20.0-beta.tgz#16de669d8b7589b6f871970860327f4f5700d502"
-  integrity sha512-EWt/QJ4oAWiL19qw+CveiFOxT0rsMFCC80621lNHVKSCyElrT7uPBzytlqnPSDq2M//9ZfWb8mxuVnKwy7gcvQ==
+oso@^0.25.1:
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/oso/-/oso-0.25.1.tgz#167dfada857232fe77812b9793ca37cd06bc7d51"
+  integrity sha512-0RZKZnmpvL1lKpml6hW4gUvrz/5tpOK2Gqlj73JJlkRt3lte2nmOYbfFz35laxbf1MgBSHkgy3ASBqy4wh93Dg==
+  dependencies:
+    lodash.isequal "^4.5.0"
 
 p-event@^4.2.0:
   version "4.2.0"

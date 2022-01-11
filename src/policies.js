@@ -49,11 +49,12 @@ allow(_actor, _action, _resource);
 
 const emptyPolicy = {
   name: "Empty",
-  polar: `
+  displayPolar: `
 # Oso is deny-by-default, so an empty policy
 # means nobody can do anything. This system is
 # locked down.
 `.trim(),
+  polar: "allow(_, _, _) if false;",
   users: {
     "-": new classes.User(),
   },

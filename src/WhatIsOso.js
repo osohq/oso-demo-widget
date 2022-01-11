@@ -413,7 +413,7 @@ export default function WhatIsOso() {
             language="ruby"
             style={dark}
           >
-            {policy.polar}
+            {policy.displayPolar || policy.polar}
           </SyntaxHighlighter>
           <div className="shadow" />
         </div>
