@@ -1,5 +1,5 @@
 export const classes = {
-  User: class {
+  User: class User {
     constructor(roles = []) {
       this.roles = roles.map(([name, resource]) => ({
         name,
@@ -7,14 +7,14 @@ export const classes = {
       }));
     }
   },
-  Repository: class {
+  Repository: class Repository {
     constructor(organization, name, isPublic = false) {
       this.name = name;
       this.organization = organization;
       this.isPublic = isPublic;
     }
   },
-  Organization: class {
+  Organization: class Organization {
     constructor(name) {
       this.name = name;
     }
