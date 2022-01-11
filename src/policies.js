@@ -1,6 +1,5 @@
 export const classes = {
   User: class {
-    static name = "User";
     constructor(roles = []) {
       this.roles = roles.map(([name, resource]) => ({
         name,
@@ -9,7 +8,6 @@ export const classes = {
     }
   },
   Repository: class {
-    static name = "Repository";
     constructor(organization, name, isPublic = false) {
       this.name = name;
       this.organization = organization;
@@ -17,7 +15,6 @@ export const classes = {
     }
   },
   Organization: class {
-    static name = "Organization";
     constructor(name) {
       this.name = name;
     }
