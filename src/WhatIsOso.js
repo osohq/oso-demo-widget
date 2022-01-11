@@ -165,9 +165,9 @@ export default function WhatIsOso() {
   const oso = useMemo(() => {
     if (!Oso) return null;
     const oso = new Oso();
-    oso.registerClass(classes.User);
-    oso.registerClass(classes.Repository);
-    oso.registerClass(classes.Organization);
+    oso.registerClass(classes.User, { name: "User" });
+    oso.registerClass(classes.Repository, { name: "Repository" });
+    oso.registerClass(classes.Organization, { name: "Organization" });
     return oso;
   }, [Oso]);
 
