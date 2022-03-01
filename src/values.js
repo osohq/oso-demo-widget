@@ -5,7 +5,7 @@ const beAnOwner = {
 
 **We succeed by empowering decision-making and
 accountability with the individual. It only
-works if she takes it on.**
+works if each of us takes it on.**
 
 - Focus on *goals* rather than *tasks*; how you
   meet the goal can be up to you
