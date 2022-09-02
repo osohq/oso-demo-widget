@@ -132,22 +132,23 @@ const FactList = ({ facts, selectedOutput, setSelectedOutput }) => {
 export default function MarketingWidget() {
   const [selectedOutput, setSelectedOutput] = React.useState("bobDeleteAnvils");
   const [isPaused, setIsPaused] = React.useState(false);
+  const outputNames = Object.keys(outputs);
+  const index = outputNames.indexOf(selectedOutput);
+  const nextOutput = outputNames[(index + 1) % outputNames.length];
 
   useEffect(() => {
     if (isPaused) {
-      // resume in 10 seconds
-      const timeout = setTimeout(() => setIsPaused(false), 10000);
+      // resume in 5 seconds
+      const timeout = setTimeout(() => setIsPaused(false), 5000);
       return () => clearTimeout(timeout);
     }
     // cycle through outputs every 5 seconds
-    const interval = setInterval(() => {
-      const outputNames = Object.keys(outputs);
-      const index = outputNames.indexOf(selectedOutput);
-      setSelectedOutput(outputNames[(index + 1) % outputNames.length]);
+    const timeout = setTimeout(() => {
+      setSelectedOutput(nextOutput);
     }, 5000);
 
-    return () => clearInterval(interval);
-  }, [isPaused, selectedOutput, setSelectedOutput]);
+    return () => clearTimeout(timeout);
+  }, [isPaused, selectedOutput, setSelectedOutput, nextOutput]);
 
   const overrideSelectedOutput = (output) => {
     setSelectedOutput(output);
@@ -199,7 +200,15 @@ export default function MarketingWidget() {
             justifyContent: "center",
           }}
         >
-          <AnimatedOutputs outputs={outputs} selectedOutput={selectedOutput} />
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => overrideSelectedOutput(nextOutput)}
+          >
+            <AnimatedOutputs
+              outputs={outputs}
+              selectedOutput={selectedOutput}
+            />
+          </span>
         </div>
       </div>
     </div>
