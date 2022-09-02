@@ -144,7 +144,7 @@ export default function MarketingWidget() {
       const outputNames = Object.keys(outputs);
       const index = outputNames.indexOf(selectedOutput);
       setSelectedOutput(outputNames[(index + 1) % outputNames.length]);
-    }, 15000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isPaused, selectedOutput, setSelectedOutput]);
@@ -211,7 +211,7 @@ const Arrows = () => {
     <div
       style={{
         padding: "30px 20px 10px",
-        width: 80,
+        width: 120,
         flexShrink: 1,
       }}
     >
