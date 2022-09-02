@@ -4102,6 +4102,11 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
+react-icons@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.4.0.tgz#a13a8a20c254854e1ec9aecef28a95cdf24ef703"
+  integrity sha512-fSbvHeVYo/B5/L4VhB7sBA1i2tS8MkT0Hb9t2H1AVPkwGfVHLJCqyr2Py9dKMxsyM63Eng1GkdZfbWj+Fmv8Rg==
+
 react-syntax-highlighter@^15.4.4:
   version "15.4.4"
   resolved "https://registry.yarnpkg.com/react-syntax-highlighter/-/react-syntax-highlighter-15.4.4.tgz#dc9043f19e7bd063ff3ea78986d22a6eaa943b2a"
@@ -4804,6 +4809,11 @@ totalist@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/totalist/-/totalist-1.1.0.tgz#a4d65a3e546517701e3e5c37a47a70ac97fe56df"
   integrity sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==
+
+transition-hook@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/transition-hook/-/transition-hook-1.5.2.tgz#2af407a2bfa7fc84dec0b19af5ccd5fc88408e38"
+  integrity sha512-zVW5wP+hzOCk56jU5V5GAIsuaf+gZv43pzxyimXQ74JnD1yoprxTfzoPjr0yjC/Mrc9JyCh3Wb6UhXD+8dlO4w==
 
 tslib@^2.0.3:
   version "2.3.1"
