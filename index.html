@@ -11,6 +11,21 @@
       * {
         box-sizing: border-box;
       }
+
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 1rem;
+      }
+      @media (max-width: 600px) {
+        .cols {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .col {
+        /* TODO */
+      }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,8 +37,8 @@
   </head>
   <body>
     <div style="max-width: 1100px; margin: 200px auto 0; padding: 0 10px">
-      <div style="display: flex">
-        <div style="flex: 1">
+      <div class="cols">
+        <div class="col">
           <div style="font-size: 48px; line-height: 1.1em; font-weight: bold">
             Authorization<br />
             as a Service
@@ -43,7 +58,7 @@
             tincidunt nisl lorem eu nisl.
           </div>
         </div>
-        <div style="flex: 1; padding: 0 20px">
+        <div class="col">
           <div id="oso-marketing-widget"></div>
         </div>
       </div>

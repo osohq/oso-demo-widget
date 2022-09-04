@@ -103,13 +103,14 @@ const FactList = ({ facts, selectedOutput, setSelectedOutput }) => {
       dependentOutputs[Math.floor(Math.random() * dependentOutputs.length)][0];
     setSelectedOutput(randomOutput);
   };
+  const selectedDependencies = dependencies[selectedOutput] || [];
   return (
     <div>
       {facts.map((fact) => (
         <div
           key={fact}
           style={{
-            opacity: dependencies[selectedOutput].includes(fact) ? 1 : 0.2,
+            opacity: selectedDependencies.includes(fact) ? 1 : 0.2,
             transition: "opacity 0.2s",
             textIndent: "-1em",
             paddingLeft: "1em",
@@ -130,13 +131,18 @@ const FactList = ({ facts, selectedOutput, setSelectedOutput }) => {
 };
 
 export default function MarketingWidget() {
-  const [selectedOutput, setSelectedOutput] = React.useState("bobDeleteAnvils");
+  const [selectedOutput, setSelectedOutput] = React.useState(null);
   const [isPaused, setIsPaused] = React.useState(false);
   const outputNames = Object.keys(outputs);
   const index = outputNames.indexOf(selectedOutput);
   const nextOutput = outputNames[(index + 1) % outputNames.length];
 
   useEffect(() => {
+    if (!selectedOutput) {
+      // initial state: only wait short time
+      const timeout = setTimeout(() => setSelectedOutput(nextOutput), 500);
+      return () => clearTimeout(timeout);
+    }
     if (isPaused) {
       // resume in 5 seconds
       const timeout = setTimeout(() => setIsPaused(false), 5000);
@@ -185,7 +191,7 @@ export default function MarketingWidget() {
               setSelectedOutput={overrideSelectedOutput}
             />
           </div>
-          <Arrows />
+          <Arrow />
           <div style={{ flex: "1", padding: "10px 0" }}>
             <FactList
               facts={issueFacts}
@@ -215,13 +221,14 @@ export default function MarketingWidget() {
   );
 }
 
-const Arrows = () => {
+const Arrow = () => {
   return (
     <div
       style={{
         padding: "30px 20px 10px",
         width: 120,
         flexShrink: 1,
+        alignSelf: "flex-end",
       }}
     >
       <img src={arrows} style={{ width: "100%" }} />
@@ -238,11 +245,12 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: 60,
+        height: 40,
       }}
     >
       {transition((item, stage) => {
         const output = outputs[item];
+        if (!output) return null;
         return (
           <div
             key={item}
@@ -253,6 +261,7 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
                 stage === "from" ? 10 : stage === "leave" ? -10 : 0
               }px) scaleY(${stage !== "enter" ? 0.4 : 1})`,
               transition: "opacity 0.4s, transform 0.4s",
+              whiteSpace: "nowrap",
             }}
           >
             <Output output={output} />
