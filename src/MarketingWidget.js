@@ -1,6 +1,15 @@
 import React, { useEffect } from "react";
 import arrows from "./arrows.svg";
-import { HiCheck, HiX } from "react-icons/hi";
+import {
+  HiChatAlt,
+  HiCheck,
+  HiDocument,
+  HiOutlineChatAlt,
+  HiOutlineDocument,
+  HiUser,
+  HiX,
+} from "react-icons/hi";
+import { MdCorporateFare, MdDescription } from "react-icons/md";
 import { useListTransition } from "transition-hook";
 
 // const colors = {
@@ -11,33 +20,92 @@ import { useListTransition } from "transition-hook";
 // };
 
 const colors = {
-  User: "#ffffff",
+  User: "#000000",
   Repo: "#ffffff",
   Org: "#ffffff",
   Issue: "#ffffff",
 };
 
 const V = ({ children }) => {
-  const color = colors[children.split(":")[0]] || "#ffffff";
+  let type = children.split(":")[0];
+  let id = children.split(":")[1];
+  let icon = null;
 
-  const backgroundColor = color + "33";
-  const borderColor = color + "44";
+  const color = colors[type] || "#ffffff";
+
+  let backgroundColor = color + "33";
+  let borderColor = color + "44";
+  let styles = {
+    fontFamily: `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace`,
+    fontSize: "0.9em",
+    fontWeight: 600,
+    padding: "2px 4px",
+    borderRadius: "3px",
+    background: backgroundColor,
+    display: "inline",
+    alignItems: "center",
+    borderColor,
+    whiteSpace: "nowrap",
+  };
+
+  if (type === "User") {
+    // Gradient background for span
+    const [fromColor, toColor] = {
+      bob: ["#d000ff", "#ff00ff"],
+      alice: ["#ff3a00", "#ff5a00"],
+      carol: ["#ff0000", "#ff0077"],
+    }[id] || ["#ffffff", "#ffffff"];
+
+    styles.background = `linear-gradient(90deg, ${fromColor} 0%, ${toColor} 100%)`;
+    // styles.color = "black";
+
+    id = id[0].toUpperCase() + id.slice(1);
+    icon = <HiUser style={{ verticalAlign: "text-top", marginRight: 2 }} />;
+  }
+
+  if (type === "Repo") {
+    id = id[0].toUpperCase() + id.slice(1);
+    icon = (
+      <MdDescription style={{ verticalAlign: "text-top", marginRight: 2 }} />
+    );
+  }
+
+  if (type === "Org") {
+    id = id[0].toUpperCase() + id.slice(1);
+    // styles.background = `linear-gradient(90deg, #ddddff 0%, #eeeeff 100%)`;
+    // styles.color = "black";
+
+    icon = (
+      <MdCorporateFare style={{ verticalAlign: "text-top", marginRight: 2 }} />
+    );
+  }
+
+  if (type === "Issue") {
+    // id = id[0].toUpperCase() + id.slice(1);
+    // styles.background = `linear-gradient(90deg, #ffdddd 0%, #fff 100%)`;
+    // styles.color = "black";
+
+    icon = (
+      <HiOutlineChatAlt style={{ verticalAlign: "text-top", marginRight: 2 }} />
+    );
+    id = "too heavy!";
+  }
 
   return (
-    <span
-      style={{
-        fontFamily: `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace`,
-        fontSize: "0.9em",
-        fontWeight: 600,
-        border: "1px solid black",
-        padding: "1px 3px",
-        borderRadius: "3px",
-        backgroundColor,
-        borderColor,
-      }}
-    >
-      {children}
-    </span>
+    <>
+      {/* {type === "Issue" ? "comment " : ""}
+      {type === "Repo" ? "doc " : ""}
+      {type === "Org" ? "org " : ""} */}
+      <span style={styles}>
+        {icon || (
+          <span>
+            {type}
+            {type && id && ":"}
+          </span>
+        )}
+        <span>{id}</span>
+      </span>
+    </>
   );
 };
 
