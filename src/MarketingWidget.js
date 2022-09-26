@@ -11,6 +11,7 @@ import {
 } from "react-icons/hi";
 import { MdCorporateFare, MdDescription } from "react-icons/md";
 import { useListTransition } from "transition-hook";
+import drawElectricity from "./drawElectricity";
 
 // const colors = {
 //   User: "#ffff77",
@@ -52,12 +53,11 @@ const V = ({ children }) => {
     // Gradient background for span
     const [fromColor, toColor] = {
       bob: ["#d000ff", "#ff00ff"],
-      alice: ["#ff3a00", "#ff5a00"],
-      carol: ["#ff0000", "#ff0077"],
+      alice: ["#1BA0E3", "#19A7CF"],
+      carol: ["#ff3a00", "#ff5a00"],
     }[id] || ["#ffffff", "#ffffff"];
 
     styles.background = `linear-gradient(90deg, ${fromColor} 0%, ${toColor} 100%)`;
-    // styles.color = "black";
 
     id = id[0].toUpperCase() + id.slice(1);
     icon = <HiUser style={{ verticalAlign: "text-top", marginRight: 2 }} />;
@@ -156,7 +156,7 @@ for (const factName in inputFacts) {
   factsBySource[factSource].push(factName);
 }
 
-const FactList = ({ facts, selectedOutput, setSelectedOutput }) => {
+const FactList = ({ facts, selectedOutput, setSelectedOutput, refs }) => {
   const randomDependentOutput = (fact) => {
     let dependentOutputs = Object.entries(dependencies).filter(
       ([output, deps]) => deps.includes(fact)
@@ -177,13 +177,17 @@ const FactList = ({ facts, selectedOutput, setSelectedOutput }) => {
       {facts.map((fact) => (
         <div
           key={fact}
+          ref={refs[fact]}
           style={{
             opacity: selectedDependencies.includes(fact) ? 1 : 0.2,
             transition: "opacity 0.2s",
             textIndent: "-1em",
             paddingLeft: "1em",
-            paddingTop: 8,
+            marginTop: 8,
             lineHeight: "1.5em",
+            textShadow: selectedDependencies.includes(fact)
+              ? "0 0 10px #ffffff99"
+              : "none",
           }}
         >
           <span
@@ -233,8 +237,24 @@ export default function MarketingWidget() {
   const repoFacts = factsBySource.repos;
   const issueFacts = factsBySource.issues;
 
+  const factRefs = Object.keys(inputFacts).reduce((acc, factName) => {
+    acc[factName] = React.useRef();
+    return acc;
+  }, {});
+  const electricityToRef = React.useRef();
+  const containerRef = React.useRef();
+
+  const fromRefs = selectedOutput
+    ? dependencies[selectedOutput].map((fact) => factRefs[fact])
+    : [];
+
   return (
-    <div>
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <Electricity
+        fromRefs={fromRefs}
+        toRef={electricityToRef}
+        containerRef={containerRef}
+      />
       <div
         style={{ display: "flex", flexDirection: "column", fontSize: "11pt" }}
       >
@@ -249,6 +269,7 @@ export default function MarketingWidget() {
             facts={roleFacts}
             selectedOutput={selectedOutput}
             setSelectedOutput={overrideSelectedOutput}
+            refs={factRefs}
           />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -257,6 +278,7 @@ export default function MarketingWidget() {
               facts={repoFacts}
               selectedOutput={selectedOutput}
               setSelectedOutput={overrideSelectedOutput}
+              refs={factRefs}
             />
           </div>
           <Arrow />
@@ -265,6 +287,7 @@ export default function MarketingWidget() {
               facts={issueFacts}
               selectedOutput={selectedOutput}
               setSelectedOutput={overrideSelectedOutput}
+              refs={factRefs}
             />
           </div>
         </div>
@@ -275,6 +298,7 @@ export default function MarketingWidget() {
           }}
         >
           <span
+            ref={electricityToRef}
             style={{ cursor: "pointer" }}
             onClick={() => overrideSelectedOutput(nextOutput)}
           >
@@ -289,10 +313,85 @@ export default function MarketingWidget() {
   );
 }
 
+function subtractRect(a, b) {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
+    width: a.width,
+    height: a.height,
+  };
+}
+
+function scaleRect(a, multiple) {
+  return {
+    x: a.x * multiple,
+    y: a.y * multiple,
+    width: a.width * multiple,
+    height: a.height * multiple,
+  };
+}
+
+const ElectricityLine = ({ fromRef, toRef, containerRef }) => {
+  const from = fromRef.current;
+  const to = toRef.current;
+  const container = containerRef.current;
+  const canvas = React.useRef();
+  useEffect(() => {
+    if (!canvas.current) return;
+
+    const fromRect = from.getBoundingClientRect();
+    const toRect = to.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const fromRectInContainer = subtractRect(fromRect, containerRect);
+    const toRectInContainer = subtractRect(toRect, containerRect);
+
+    const scaledFromRect = scaleRect(fromRectInContainer, 2);
+    const scaledToRect = scaleRect(toRectInContainer, 2);
+
+    drawElectricity(canvas.current, scaledFromRect, scaledToRect);
+  }, [from, to, container]);
+
+  if (!from || !to || !container) return null;
+
+  return (
+    <canvas
+      ref={canvas}
+      width={container.clientWidth * 2}
+      height={container.clientHeight * 2}
+      style={{
+        position: "absolute",
+        pointerEvents: "none",
+        top: 0,
+        left: 0,
+        width: container.clientWidth,
+        height: container.clientHeight,
+      }}
+    />
+  );
+};
+
+const Electricity = ({ fromRefs, toRef, containerRef }) => {
+  return (
+    <>
+      {fromRefs.map((fromRef) => (
+        <ElectricityLine
+          key={fromRef}
+          fromRef={fromRef}
+          toRef={toRef}
+          containerRef={containerRef}
+        />
+      ))}
+    </>
+  );
+};
+
 const Arrow = () => {
   return (
     <div
       style={{
+        position: "relative",
+        zIndex: 100,
         padding: "30px 20px 10px",
         width: 120,
         flexShrink: 1,
@@ -313,7 +412,7 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: 40,
+        height: 60,
       }}
     >
       {transition((item, stage) => {
@@ -326,10 +425,11 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
               position: "absolute",
               opacity: stage === "enter" ? 1 : 0,
               transform: `translateY(${
-                stage === "from" ? 10 : stage === "leave" ? -10 : 0
+                stage === "from" ? 20 : stage === "leave" ? -20 : 0
               }px) scaleY(${stage !== "enter" ? 0.4 : 1})`,
               transition: "opacity 0.4s, transform 0.4s",
               whiteSpace: "nowrap",
+              textShadow: stage === "enter" ? "0 0 10px #ffffff99" : "none",
             }}
           >
             <Output output={output} />
@@ -342,17 +442,44 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
 
 const Output = ({ output }) => {
   const allowed = output[1] === "can";
+  const gradient = allowed
+    ? "linear-gradient(90deg, #00aa44 0%, #00cc22 100%)"
+    : "linear-gradient(90deg, #ff0000 0%, #ff0000 100%)";
   return (
-    <span style={{ display: "flex", alignItems: "center" }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <span
-        style={{ fontSize: "1.5em", color: allowed ? "#13EF6B" : "#ED183E" }}
+        style={{
+          fontSize: "1em",
+          // padding: "0.125rem 0.25rem",
+          // borderRadius: 4,
+          // background: gradient,
+          marginBottom: "0.25rem",
+          display: "flex",
+          alignItems: "center",
+        }}
       >
-        {allowed ? <HiCheck /> : <HiX />}
+        <span
+          style={{
+            fontSize: "1.5em",
+            padding: "0.125rem",
+            borderRadius: 4,
+            background: gradient,
+          }}
+        >
+          {allowed ? <HiCheck /> : <HiX />}
+        </span>
+        {/* <span style={{ marginLeft: "0.25rem" }}>
+          {allowed ? "Allowed" : "Denied"}
+        </span> */}
       </span>
-      <span>
-        <V>{output[0]}</V> {output[1]} <V>{output[2]}</V> <V>{output[3]}</V>
+      <span style={{ display: "flex", alignItems: "center" }}>
+        <span>
+          <V>{output[0]}</V> {output[1]} <V>{output[2]}</V> <V>{output[3]}</V>
+        </span>
       </span>
-    </span>
+    </div>
   );
 };
 
