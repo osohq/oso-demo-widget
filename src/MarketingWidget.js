@@ -236,7 +236,7 @@ export default function MarketingWidget() {
     // cycle through outputs every 5 seconds
     const timeout = setTimeout(() => {
       setSelectedOutput(nextOutput);
-    }, 500000);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, [isPaused, selectedOutput, setSelectedOutput, nextOutput]);
@@ -269,7 +269,12 @@ export default function MarketingWidget() {
         containerRef={containerRef}
       />
       <div
-        style={{ display: "flex", flexDirection: "column", fontSize: "12pt" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          fontSize: "13pt",
+          fontFamily: "system-ui",
+        }}
       >
         <div
           style={{
