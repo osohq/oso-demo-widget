@@ -12,6 +12,18 @@ import {
 import { MdCorporateFare, MdDescription } from "react-icons/md";
 import { useListTransition } from "transition-hook";
 import drawElectricity from "./drawElectricity";
+import tinycolor from "tinycolor2";
+
+const colors = {
+  success: "#24da78",
+  danger: "#da2424",
+  warning: "#ff9f1c",
+  primary1: "#392396",
+  primary2: "#bae8e8",
+  primary3: "#e3f6f5",
+  primary4: "#ffd803",
+  darkPurple: "#312F54",
+};
 
 // const colors = {
 //   User: "#ffff77",
@@ -20,22 +32,21 @@ import drawElectricity from "./drawElectricity";
 //   Issue: "#77ffff",
 // };
 
-const colors = {
-  User: "#000000",
-  Repo: "#ffffff",
-  Org: "#ffffff",
-  Issue: "#ffffff",
-};
+// const colors = {
+//   User: "#000000",
+//   Repo: "#ffffff",
+//   Org: "#ffffff",
+//   Issue: "#ffffff",
+// };
 
 const V = ({ children }) => {
   let type = children.split(":")[0];
   let id = children.split(":")[1];
   let icon = null;
 
-  const color = colors[type] || "#ffffff";
+  const color = colors.primary1;
 
-  let backgroundColor = color + "33";
-  let borderColor = color + "44";
+  let backgroundColor = color;
   let styles = {
     fontFamily: `Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace`,
     fontSize: "0.9em",
@@ -45,19 +56,21 @@ const V = ({ children }) => {
     background: backgroundColor,
     display: "inline",
     alignItems: "center",
-    borderColor,
     whiteSpace: "nowrap",
+    border: `1px solid #ffffff22`,
   };
 
   if (type === "User") {
     // Gradient background for span
     const [fromColor, toColor] = {
-      bob: ["#d000ff", "#ff00ff"],
-      alice: ["#1BA0E3", "#19A7CF"],
-      carol: ["#ff3a00", "#ff5a00"],
+      bob: [colors.primary2, tinycolor(colors.primary2).spin(20).toHexString()],
+      alice: [colors.primary4, colors.primary4],
+      carol: [colors.warning, tinycolor(colors.warning).spin(10).toHexString()],
     }[id] || ["#ffffff", "#ffffff"];
 
     styles.background = `linear-gradient(90deg, ${fromColor} 0%, ${toColor} 100%)`;
+    styles.color = "#000";
+    styles.border = `1px solid transparent`;
 
     id = id[0].toUpperCase() + id.slice(1);
     icon = <HiUser style={{ verticalAlign: "text-top", marginRight: 2 }} />;
@@ -444,7 +457,7 @@ const Output = ({ output }) => {
   const allowed = output[1] === "can";
   const gradient = allowed
     ? "linear-gradient(90deg, #00aa44 0%, #00cc22 100%)"
-    : "linear-gradient(90deg, #ff0000 0%, #ff0000 100%)";
+    : "linear-gradient(90deg, #dd2200 0%, #ff2200 100%)";
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}

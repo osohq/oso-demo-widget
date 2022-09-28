@@ -70,9 +70,6 @@ export default function drawElectricity(canvas, fromRect, toRect) {
         const deviance = 10 * mult * mult;
         const devX = (Math.random() * 1 - 0.5) * deviance;
         const devY = (Math.random() * 1 - 0.5) * deviance;
-        if (Math.random() < 0.001) {
-          console.log("deviance", deviance, i);
-        }
         ctx.lineTo(x + devX, y + devY);
         realToX = x + devX;
         realToY = y + devY;
