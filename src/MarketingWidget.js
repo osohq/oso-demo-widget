@@ -65,7 +65,7 @@ const V = ({ children }) => {
     const [fromColor, toColor] = {
       bob: [colors.primary2, tinycolor(colors.primary2).spin(20).toHexString()],
       alice: [colors.primary4, colors.primary4],
-      carol: [colors.warning, tinycolor(colors.warning).spin(10).toHexString()],
+      carol: [colors.warning, colors.warning],
     }[id] || ["#ffffff", "#ffffff"];
 
     styles.background = `linear-gradient(90deg, ${fromColor} 0%, ${toColor} 100%)`;
@@ -236,7 +236,7 @@ export default function MarketingWidget() {
     // cycle through outputs every 5 seconds
     const timeout = setTimeout(() => {
       setSelectedOutput(nextOutput);
-    }, 5000);
+    }, 500000);
 
     return () => clearTimeout(timeout);
   }, [isPaused, selectedOutput, setSelectedOutput, nextOutput]);
@@ -269,7 +269,7 @@ export default function MarketingWidget() {
         containerRef={containerRef}
       />
       <div
-        style={{ display: "flex", flexDirection: "column", fontSize: "11pt" }}
+        style={{ display: "flex", flexDirection: "column", fontSize: "12pt" }}
       >
         <div
           style={{
@@ -387,9 +387,9 @@ const ElectricityLine = ({ fromRef, toRef, containerRef }) => {
 const Electricity = ({ fromRefs, toRef, containerRef }) => {
   return (
     <>
-      {fromRefs.map((fromRef) => (
+      {fromRefs.map((fromRef, i) => (
         <ElectricityLine
-          key={fromRef}
+          key={i}
           fromRef={fromRef}
           toRef={toRef}
           containerRef={containerRef}
@@ -456,8 +456,12 @@ const AnimatedOutputs = ({ outputs, selectedOutput }) => {
 const Output = ({ output }) => {
   const allowed = output[1] === "can";
   const gradient = allowed
-    ? "linear-gradient(90deg, #00aa44 0%, #00cc22 100%)"
-    : "linear-gradient(90deg, #dd2200 0%, #ff2200 100%)";
+    ? `linear-gradient(90deg, ${tinycolor(colors.success).darken(
+        10
+      )} 0%, ${tinycolor(colors.success).darken(5)} 100%)`
+    : `linear-gradient(90deg, ${tinycolor(colors.danger).lighten(
+        3
+      )} 0%, ${tinycolor(colors.danger).lighten(5)} 100%)`;
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
@@ -481,7 +485,11 @@ const Output = ({ output }) => {
             background: gradient,
           }}
         >
-          {allowed ? <HiCheck /> : <HiX />}
+          {allowed ? (
+            <HiCheck style={{ display: "block" }} />
+          ) : (
+            <HiX style={{ display: "block" }} />
+          )}
         </span>
         {/* <span style={{ marginLeft: "0.25rem" }}>
           {allowed ? "Allowed" : "Denied"}
