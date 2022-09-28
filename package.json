@@ -24,6 +24,7 @@
     "react-syntax-highlighter": "^15.4.4",
     "style-loader": "^3.2.1",
     "styled-jsx": "^4.0.1",
+    "tinycolor2": "^1.4.2",
     "transition-hook": "^1.5.2",
     "util": "^0.12.4",
     "webpack": "^5.52.1",
