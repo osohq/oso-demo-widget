@@ -57,7 +57,7 @@ const V = ({ children }) => {
     display: "inline",
     alignItems: "center",
     whiteSpace: "nowrap",
-    border: `1px solid #ffffff22`,
+    border: `1px solid #ffffff44`,
   };
 
   if (type === "User") {
@@ -192,7 +192,7 @@ const FactList = ({ facts, selectedOutput, setSelectedOutput, refs }) => {
           key={fact}
           ref={refs[fact]}
           style={{
-            opacity: selectedDependencies.includes(fact) ? 1 : 0.2,
+            opacity: selectedDependencies.includes(fact) ? 1 : 0.1,
             transition: "opacity 0.2s",
             textIndent: "-1em",
             paddingLeft: "1em",
