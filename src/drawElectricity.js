@@ -1,15 +1,16 @@
 import { createNoise2D } from "simplex-noise";
 
-const noise = [createNoise2D(), createNoise2D(), createNoise2D()];
-
 export default function drawElectricity(canvas, fromRect, toRect) {
   const ctx = canvas.getContext("2d");
+
+  const noise = [createNoise2D(), createNoise2D(), createNoise2D()];
 
   // ctx.strokeRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
   // ctx.strokeRect(toRect.x, toRect.y, toRect.width, toRect.height);
 
   const averageFromX = fromRect.x + fromRect.width / 2;
   const averageToX = toRect.x + toRect.width / 2;
+  let stopped = false;
 
   const diffX = averageToX - averageFromX;
   let direction = "center";
@@ -42,8 +43,9 @@ export default function drawElectricity(canvas, fromRect, toRect) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!canvas.isConnected) return;
     function line(index) {
+      const t = new Date().getTime() - start;
       ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = Math.min((t / 500) * 4, 4);
       ctx.beginPath();
       ctx.shadowBlur = 10;
       ctx.shadowColor = "#eeeeffff";
@@ -53,14 +55,13 @@ export default function drawElectricity(canvas, fromRect, toRect) {
       let realFromY = undefined;
       let realToX = undefined;
       let realToY = undefined;
-      const t = new Date().getTime() - start;
 
       // ctx.strokeRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
       // ctx.strokeRect(toRect.x, toRect.y, toRect.width, toRect.height);
 
       // Animate the lines in from the center
-      const startI = Math.max(1 - Math.sqrt(t / 100), 0.05);
-      const endI = Math.min(Math.sqrt(t / 200), 0.9);
+      const startI = Math.max(1 - t / 100, 0.05);
+      const endI = Math.min(t / 200, 0.9);
 
       for (let i = startI; i < endI; i += 0.03) {
         const [x, y] = cubicBezier(
@@ -74,16 +75,17 @@ export default function drawElectricity(canvas, fromRect, toRect) {
         );
 
         function getRandom() {
-          const y = t / 100;
-          const highFreqWeight = 0.6;
+          const y = t / 500;
+          const highFreqWeight = 0.3;
+          const highFreq = 8;
           return (
             noise[index](i, y) * (1 - highFreqWeight) +
-            highFreqWeight * noise[index](i * 3, y * 3)
+            highFreqWeight * noise[index](i * highFreq, y * highFreq)
           );
         }
 
         const mult = Math.sin((i * 0.9 + 0.1) * Math.PI);
-        const deviance = 6 * mult * mult;
+        const deviance = 10 * mult * mult;
         const amt = getRandom() * deviance;
         const [normalX, normalY] = cubicBezierNormal(
           fromX,
@@ -105,6 +107,7 @@ export default function drawElectricity(canvas, fromRect, toRect) {
       }
 
       ctx.stroke();
+      ctx.stroke();
       ctx.fillStyle = "#fff";
       // draw circle at beginning and end
       ctx.beginPath();
@@ -117,10 +120,14 @@ export default function drawElectricity(canvas, fromRect, toRect) {
     for (let i = 0; i < 1; i++) {
       line(i);
     }
-    requestAnimationFrame(draw);
+    if (!stopped) requestAnimationFrame(draw);
   };
 
   requestAnimationFrame(draw);
+
+  return () => {
+    stopped = true;
+  };
 }
 
 // Formula for bezier curve

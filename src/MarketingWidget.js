@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import arrows from "./arrows.svg";
 import {
   HiChatAlt,
@@ -354,8 +354,11 @@ const ElectricityLine = ({ fromRef, toRef, containerRef }) => {
   const to = toRef.current;
   const container = containerRef.current;
   const canvas = React.useRef();
-  useEffect(() => {
-    if (!canvas.current) return;
+  const [fromRect, setFromRect] = React.useState(null);
+  const [toRect, setToRect] = React.useState(null);
+
+  const resetRects = useCallback(() => {
+    if (!from || !to || !container) return;
 
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
@@ -367,8 +370,31 @@ const ElectricityLine = ({ fromRef, toRef, containerRef }) => {
     const scaledFromRect = scaleRect(fromRectInContainer, 2);
     const scaledToRect = scaleRect(toRectInContainer, 2);
 
-    drawElectricity(canvas.current, scaledFromRect, scaledToRect);
+    setFromRect(scaledFromRect);
+    setToRect(scaledToRect);
   }, [from, to, container]);
+
+  useEffect(() => {
+    resetRects();
+  }, [from, to, container]);
+
+  useEffect(() => {
+    if (!canvas.current || !fromRect || !toRect) return;
+
+    const stop = drawElectricity(canvas.current, fromRect, toRect);
+
+    return stop;
+  }, [canvas, fromRect, toRect]);
+
+  useEffect(() => {
+    const resize = () => {
+      resetRects();
+    };
+
+    window.addEventListener("resize", resize);
+
+    return () => window.removeEventListener("resize", resize);
+  });
 
   if (!from || !to || !container) return null;
 
