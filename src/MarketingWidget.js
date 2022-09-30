@@ -272,7 +272,6 @@ export default function MarketingWidget() {
         style={{
           display: "flex",
           flexDirection: "column",
-          fontSize: "13pt",
           fontFamily: "system-ui",
         }}
       >
@@ -299,7 +298,7 @@ export default function MarketingWidget() {
               refs={factRefs}
             />
           </div>
-          <Arrow />
+          <div style={{ width: "7em" }} />
           <div style={{ flex: "1", padding: "10px 0" }}>
             <FactList
               facts={issueFacts}
