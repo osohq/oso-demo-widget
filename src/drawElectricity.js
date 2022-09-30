@@ -76,7 +76,7 @@ export default function drawElectricity(canvas, fromRect, toRect) {
 
         function getRandom() {
           const y = t / 500;
-          const highFreqWeight = 0.3;
+          const highFreqWeight = 0.4;
           const highFreq = 8;
           return (
             noise[index](i, y) * (1 - highFreqWeight) +
@@ -85,7 +85,7 @@ export default function drawElectricity(canvas, fromRect, toRect) {
         }
 
         const mult = Math.sin((i * 0.9 + 0.1) * Math.PI);
-        const deviance = 10 * mult * mult;
+        const deviance = Math.min(6, (t / 1000) * 6) * mult * mult;
         const amt = getRandom() * deviance;
         const [normalX, normalY] = cubicBezierNormal(
           fromX,
